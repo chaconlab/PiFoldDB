@@ -13,6 +13,11 @@ subs_one= {
 'HSO':'H', 'TRO':'W', 'TRN':'W', 'TYI':'Y', 'BYR':'Y', 'LP6':'L', 'ACE':'S', 'SEB':'S', 'ALS':'S'
 }
 
+def remove_char(s, i):
+    b = bytearray(s, 'utf-8')
+    del b[i]
+    return b.decode()
+    
 def write_fasta(seq, name, wrap=80):
     fasta_file = "data/seq/" +name + ".fa" 
     with open(fasta_file, 'w') as f:
@@ -80,7 +85,7 @@ def mcif_fetch(pdb, cache_dir='data/cifs/'):
     return st
 
 
-def mcif_parse(pdb_id, sel_chain, target_atoms = ['N', 'CA', 'CB', 'C', 'O']):
+def mcif_parse(pdb_id, sel_chain, target_atoms = ['N', 'CA', 'C', 'O']):
 
 	st = mcif_fetch(pdb_id)
 # Build a dictionary
@@ -166,7 +171,7 @@ def mcif_parse(pdb_id, sel_chain, target_atoms = ['N', 'CA', 'CB', 'C', 'O']):
 
 	seq = ''
 	nres = 0
-	coords_null0 = [[float('nan')] * 3]
+	coords_null0 = [float('nan')] * 3
 	detectC = 0
 	for chain in st['1']:
 	      if chain.name == sel_chain:
@@ -207,62 +212,12 @@ def mcif_parse(pdb_id, sel_chain, target_atoms = ['N', 'CA', 'CB', 'C', 'O']):
 		      				else :
 		      					has_check += 100
 		      										
-		      			if ((has_check == 5 and residue.name != "GLY") or (has_check == 4 and residue.name == "GLY")) :
+		      			if ( has_check == 4 ) :
 		      				#print (gemmi.find_tabulated_residue(residue.name).one_letter_code, " ",residue.seqid.num, "type-", residue.entity_type,"-")
 
 		      				
 		      				seq=seq+aa
 
-		      				# add virtual CB
-		      				if (residue.name == "GLY") :
-		      				  alpha = 54.7 * np.pi / 180.0;
-		      				  BONDLEN = 1.524
-		      				  x1 = mmtf_dict['coords']['N'][nres][0]
-		      				  y1 = mmtf_dict['coords']['N'][nres][1]
-		      				  z1 = mmtf_dict['coords']['N'][nres][2]
-		      				  x2 = mmtf_dict['coords']['CA'][nres][0]
-		      				  y2 = mmtf_dict['coords']['CA'][nres][1]
-		      				  z2 = mmtf_dict['coords']['CA'][nres][2]
-		      				  x3 = mmtf_dict['coords']['C'][nres][0]
-		      				  y3 = mmtf_dict['coords']['C'][nres][1]
-		      				  z3 = mmtf_dict['coords']['C'][nres][2]
-		      				  x21=x2-x1;
-		      				  y21=y2-y1;
-		      				  z21=z2-z1;
-		      				  r21= np.sqrt((x21*x21 + y21*y21 + z21*z21));
-		      				  x23=x2-x3;
-		      				  y23=y2-y3;
-		      				  z23=z2-z3;
-		      				  r23= np.sqrt((x23*x23 + y23*y23 + z23*z23));
-		      				  cosa=np.cos(alpha);
-		      				  sina=np.sin(alpha);
-		      				  xa=x21/r21;
-		      				  ya=y21/r21;
-		      				  za=z21/r21;
-		      				  xb=x23/r23;
-		      				  yb=y23/r23;
-		      				  zb=z23/r23;
-		      				  xab=xa-xb;
-		      				  yab=ya-yb;
-		      				  zab=za-zb;
-		      				  rab= np.sqrt((xab*xab+yab*yab+zab*zab));
-		      				  xmin=xab/rab;
-		      				  ymin=yab/rab;
-		      				  zmin=zab/rab;
-		      				  xapb=xa+xb;
-		      				  yapb=ya+yb;
-		      				  zapb=za+zb;
-		      				  rapb=np.sqrt((xapb*xapb+yapb*yapb+zapb*zapb));
-		      				  xplus=xapb/rapb;
-		      				  yplus=yapb/rapb;
-		      				  zplus=zapb/rapb;
-		      				  xs=yplus*zmin-zplus*ymin;
-		      				  ys=zplus*xmin-xplus*zmin;
-		      				  zs=xplus*ymin-yplus*xmin;
-		      				  mmtf_dict['coords']['CB'][nres][0]=np.round(x2+BONDLEN*(cosa*xplus-sina*xs),3);
-		      				  mmtf_dict['coords']['CB'][nres][1]=np.round(y2+BONDLEN*(cosa*yplus-sina*ys),3);
-		      				  mmtf_dict['coords']['CB'][nres][2]=np.round(z2+BONDLEN*(cosa*zplus-sina*zs),3);
-		      				  #print (" ",mmtf_dict['coords']['CB'][nres][0]," ",mmtf_dict['coords']['CB'][nres][1]," ", mmtf_dict['coords']['CB'][nres][2])
 		      				  
 		      				nres+=1;
 		      				
@@ -378,10 +333,31 @@ def mcif_parse(pdb_id, sel_chain, target_atoms = ['N', 'CA', 'CB', 'C', 'O']):
 		mmtf_dict['seq'] = []
 		mmtf_dict['coords'] = []
 	else :
+
+		x=0
+		limit =len(seq)-1
+		while x < limit:
+			if (seq[x] == 'X') :
+			   for code in target_atoms:
+			     mmtf_dict['coords'][code][x] = coords_null0
+			   jj=x+1	
+			   while jj < len(seq)-1:
+			     if (seq[jj] == 'X') :
+			        seq = remove_char(seq,jj)
+			        for code in target_atoms :
+			        	del mmtf_dict['coords'][code][jj]
+			        limit-=1
+			     else: 
+			        jj=1000000000	
+			x+=1	     
+
 		fasta = pdb_id+"."+sel_chain
 		fasta_file = "data/seq/" + fasta + ".fa"
 		if not os.path.isfile(fasta):
-			write_fasta(seq, fasta, 80)
+			write_fasta(seq.upper(), fasta, 80)
 		mmtf_dict['seq'] = seq.upper()
+		if (len(mmtf_dict['coords']['CA']) != len(seq)):
+			print ("\n\n Error", len(mmtf_dict['coords']['CA']), " seq", len(seq))
+
 	
 	return mmtf_dict

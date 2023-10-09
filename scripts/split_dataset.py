@@ -55,7 +55,7 @@ def load_cath_topologies(cath_domain_file = './cath-domain-list-4.3.0.txt'):
 if __name__ == '__main__':
 
     cath_domain_file = 'data/cath-domain-list-4.3.0.txt'
-    cath_json_file = 'chain_set500.jsonl'	
+    cath_json_file = 'chain_set800.jsonl'	
     cath_testset_file = 'testset_ingraham.txt'
     cath_json_out = 'splits.json'
         
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         if (set(cath_nodes[name]).isdisjoint(test_topology_set2)) 
     ]
 
-    valid_fraction = 0.07
+    valid_fraction = 0.05
     topo_train = list(set([t for name in splits['train'] for t in cath_nodes[name]]))
     num_topo_validation = int(valid_fraction * len(topo_train))
  

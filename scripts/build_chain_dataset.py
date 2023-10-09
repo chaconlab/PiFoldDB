@@ -2,8 +2,8 @@ import os, time, gzip, json
 from  gemmi_util import *
 from collections import defaultdict
 
-MAX_LENGTH = 500
-outfile = 'chain_set500.jsonl'
+MAX_LENGTH = 800
+outfile = 'chain_set800.jsonl'
 
 # CATH base URL
 cath_base_url = 'http://download.cathdb.info/cath/releases/all-releases/v4_3_0/'
@@ -56,7 +56,8 @@ for chain_ix, (pdb, chain) in enumerate(chain_set):
             print(pdb, chain, chain_dict['num_chains'], chain_dict['seq'])
             dataset.append(chain_dict)
         else:
-            print('Too long', pdb, " ",len(chain_dict['seq']))
+            if ( len(chain_dict['seq']) > 2 ):
+            	print('Too long', pdb, " ",len(chain_dict['seq']))
     except Exception as e:
         print(e)
 
