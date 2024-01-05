@@ -5,7 +5,7 @@ This new version included better structures (PDB-REDO), more chains, the last CA
 
 ## Datasets (enable git lfs)
 
-Preprocessed data and splits can here [cathPi.tgz] (https://saco.csic.es/index.php/s/JR5BaqeiBGg7G3D):
+Preprocessed data and splits can here [cathPi.tgz](https://saco.csic.es/index.php/s/JR5BaqeiBGg7G3D):
 
 - chain_set.jsonl   Max sequence length 500 aa
 - chain_set_splits.json   Test: 1422 Train: 18960 Validation: 1436
