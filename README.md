@@ -1,7 +1,7 @@
 # PiFoldDB
 
 This is a curated CATH 4.3 dataset for [PiFold](https://github.com/A4Bio/PiFold) (an updated version of CATH 4.2 by [Ingraham, et al, NeurIPS 2019](https://github.com/jingraham/neurips19-graph-protein-design)).
-This new version included better structures (PDB-REDO), more chains, the last CATH release, removed chains with large missing regions (), gaps, and missing regions (single X with NaN coordinates, "_" for gaps) 
+This new version included better structures (PDB-REDO), more chains, the last CATH release, included gaps (noted by "-") and missing regions (noted as "X" with NaN coordinates), removed tags, and cases with large missing regions.  
 
 ## Datasets
 
